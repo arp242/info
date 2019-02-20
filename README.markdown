@@ -2,12 +2,13 @@
 
 A simple GNU `info` replacement which isn't terrible.
 
-You can install it with `go get arp242.net/info`, which will put the binary at
-`~/go/bin/info`.
-
-This program displays the info pages with various formatting and free software
+This program displays the info pages as a single document in the standard pager
+(usually `less` or `more`) with various redundant formatting and free software
 propaganda removed (some pages contain more license text than actual useful
 content).
+
+You can install it with `go get arp242.net/info`, which will put the binary at
+`~/go/bin/info`.
 
 If the output is a terminal device the output will be piped to `MANPAGER` or
 `PAGER` if set. The default is to use `more -s`.
@@ -15,6 +16,28 @@ If the output is a terminal device the output will be piped to `MANPAGER` or
 `INFOPATH` is respected.
 
 There are no commandline options at this point.
+
+---
+
+Is this too complex? You can approximate it with something like:
+
+	info() {
+		zcat "/usr/share/info/$1.info.gz" |
+			sed -Ee "/\x1f/d; /^File: $1.info,/d; /^(Node|Ref): .*/d" |
+			cat -s |
+			less
+	}
+
+This was the original version; but it was too hard to handle stuff like info
+pages split over several files (which this snippet won't handle) so I ended up
+writing the Go tool.
+
+There's also [info2man](https://cskk.ezoshosting.com/cs/css/info2pod.html). I
+needed to make some changes to get it to work, and the output didn't look too
+great. This tool goes back to [at least
+2004](https://web.archive.org/web/20040625210730/https://cskk.ezoshosting.com/cs/css/info2pod.html).
+These criticism of Texinfo are hardly new, and the GNU folk's imperviousness to
+it isn't, either.
 
 A Texinfo rant
 --------------
@@ -80,25 +103,3 @@ moved on from it a decade ago.
 
 None of this means that man pages couldn't do with some enhancement – better
 referencing probably being the most prominent – but GNU info isn't the answer.
-
----
-
-Is this too complex? You can approximate it with something like:
-
-	info() {
-		zcat "/usr/share/info/$1.info.gz" |
-			sed -Ee "/\x1f/d; /^File: $1.info,/d; /^(Node|Ref): .*/d" |
-			cat -s |
-			less
-	}
-
-This was the original version; but it was too hard to handle stuff like info
-pages split over several files (which this snippet won't handle) so I ended up
-writing the Go tool.
-
-There's also [info2man](https://cskk.ezoshosting.com/cs/css/info2pod.html). I
-needed to make some changes to get it to work, and the output didn't look too
-great. This tool goes back to [at least
-2004](https://web.archive.org/web/20040625210730/https://cskk.ezoshosting.com/cs/css/info2pod.html).
-These criticism of Texinfo are hardly new, and the GNU folk's imperviousness to
-it isn't, either.
