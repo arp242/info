@@ -15,7 +15,8 @@ If the output is a terminal device the output will be piped to `MANPAGER` or
 
 `INFOPATH` is respected.
 
-There are no commandline options at this point.
+There are no commandline options at this point; all arguments starting with `-`
+are ignored.
 
 ---
 

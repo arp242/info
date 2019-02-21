@@ -21,21 +21,30 @@ func main() {
 		fatal(errors.New("which page?"))
 	}
 
-	fp := find(os.Args[1])
+	var page string
+	for i := 1; i < len(os.Args); i++ {
+		page = strings.TrimSpace(os.Args[i])
+		if len(page) > 0 && page[0] == '-' {
+			_, _ = fmt.Fprintf(os.Stderr, "info: ignoring option %q\n", os.Args[i])
+			continue
+		}
+
+		break
+	}
+
+	fp := find(page)
 	if fp == nil {
-		fatal(fmt.Errorf("no page for %q", os.Args[1]))
+		fatal(fmt.Errorf("no page for %q", page))
 	}
 	defer fp.Close()
 
-	page := format(fp)
-
+	out := format(fp)
 	if isatty.IsTerminal(os.Stdout.Fd()) {
-		err := pager(page)
+		err := pager(out)
 		fatal(err)
 		return
 	}
-
-	fmt.Println(page)
+	fmt.Println(out)
 }
 
 func fatal(err error) {
